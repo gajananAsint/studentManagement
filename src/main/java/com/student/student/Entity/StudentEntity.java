@@ -19,7 +19,7 @@ public class StudentEntity {
     @Column(name = "student_name")
     private String name;
     @Column(name="student_percentage")
-    private float percentage;
+    private Float percentage;
     @Column(name="student_branch")
     private String branch;
 
@@ -48,7 +48,7 @@ public class StudentEntity {
     public void setName(String name) {
         this.name = name;
     }
-    public float getPercentage() {
+    public Float getPercentage() {
         return percentage;
     }
     public void setPercentage(float percentage) {

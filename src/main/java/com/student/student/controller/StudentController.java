@@ -2,6 +2,7 @@ package com.student.student.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -42,20 +43,49 @@ public class StudentController {
     }
 
     @PutMapping("/student/update/{id}")
-    public StudentEntity updateStudents(@PathVariable int id) {
-        StudentEntity student = repo.findById(id).get();
-        student.setName("poonam");
-        student.setPercentage(92);
-        repo.save(student);
-        return student;
+    public ResponseEntity<StudentEntity> updateStudents(@PathVariable int id, @RequestBody StudentEntity updatedStudent) {
+        Optional<StudentEntity> optionalStudent = repo.findById(id);
 
+        if (optionalStudent.isPresent()) {
+            StudentEntity student = optionalStudent.get();
+
+            // Update the student's fields with the data from the request body
+            if (updatedStudent.getName() != null) {
+                student.setName(updatedStudent.getName());
+            }
+            if (updatedStudent.getPercentage() != null) {
+                student.setPercentage(updatedStudent.getPercentage());
+            }
+            if(updatedStudent.getBranch() != null){
+                student.setBranch(updatedStudent.getBranch());
+            }
+
+            repo.save(student);
+            return ResponseEntity.ok(student);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); // Return 404 if the student is not found
+        }
     }
+
+//    @DeleteMapping("/student/delete/{id}")
+//    @ResponseStatus(code = HttpStatus.NO_CONTENT)
+//    public void removeStudent(@PathVariable int id) {
+//        StudentEntity student = repo.findById(id).get();
+//        repo.delete(student);
+//
+//    }
+
     @DeleteMapping("/student/delete/{id}")
-    @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void removeStudent(@PathVariable int id) {
-        StudentEntity student = repo.findById(id).get();
-        repo.delete(student);
+    public ResponseEntity<String> removeStudent(@PathVariable int id) {
+        Optional<StudentEntity> student = repo.findById(id);
 
+        if (student.isPresent()) {
+            repo.delete(student.get());
+            return ResponseEntity.ok("Student with ID " + id + " has been successfully deleted.");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student with ID " + id + " not found.");
+        }
     }
+
 
 }
